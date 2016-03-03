@@ -62,7 +62,6 @@
 %{?el7:%global _has_lvm2app_h 1}
 %{?el7:%global _has_libudev 1}
 %{?el7:%global _has_recent_librrd 1}
-%{?el7:%global _has_varnish4 1}
 %{?el7:%global _has_broken_libmemcached 1}
 %{?el7:%global _has_iproute 1}
 %{?el7:%global _has_atasmart 1}
@@ -130,6 +129,7 @@
 %define with_nginx 0%{!?_without_nginx:1}
 %define with_notify_desktop 0%{!?_without_notify_desktop:1}
 %define with_notify_email 0%{!?_without_notify_email:1}
+%define with_notify_nagios 0%{!?_without_notify_nagios:1}
 %define with_ntpd 0%{!?_without_ntpd:1}
 %define with_numa 0%{!?_without_numa:1}
 %define with_nut 0%{!?_without_nut:1}
@@ -167,7 +167,7 @@
 %define with_uptime 0%{!?_without_uptime:1}
 %define with_users 0%{!?_without_users:1}
 %define with_uuid 0%{!?_without_uuid:1}
-%define with_varnish 0%{!?_without_varnish:0%{!?_has_varnish4:1}}
+%define with_varnish 0%{!?_without_varnish:1}
 %define with_vmem 0%{!?_without_vmem:1}
 %define with_vserver 0%{!?_without_vserver:1}
 %define with_wireless 0%{!?_without_wireless:1}
@@ -1233,6 +1233,12 @@ Collectd utilities
 %define _with_notify_email --disable-notify_email
 %endif
 
+%if %{with_notify_nagios}
+%define _with_notify_nagios --enable-notify_nagios
+%else
+%define _with_notify_nagios --disable-notify_nagios
+%endif
+
 %if %{with_ntpd}
 %define _with_ntpd --enable-ntpd
 %else
@@ -1711,6 +1717,7 @@ Collectd utilities
 	%{?_with_memory} \
 	%{?_with_network} \
 	%{?_with_nfs} \
+	%{?_with_notify_nagios} \
 	%{?_with_ntpd} \
 	%{?_with_numa} \
 	%{?_with_olsrd} \
@@ -1977,6 +1984,9 @@ fi
 %if %{with_nfs}
 %{_libdir}/%{name}/nfs.so
 %endif
+%if %{with_notify_nagios}
+%{_libdir}/%{name}/notify_nagios.so
+%endif
 %if %{with_ntpd}
 %{_libdir}/%{name}/ntpd.so
 %endif
@@ -2083,9 +2093,9 @@ fi
 %{_includedir}/collectd/network_buffer.h
 %{_includedir}/collectd/lcc_features.h
 %{_libdir}/pkgconfig/libcollectdclient.pc
+%{_libdir}/libcollectdclient.so
 
 %files -n libcollectdclient
-%{_libdir}/libcollectdclient.so
 %{_libdir}/libcollectdclient.so.*
 
 %files -n collectd-utils
@@ -2370,7 +2380,7 @@ fi
 %changelog
 #* TODO: next feature release changelog
 #- New upstream version
-#- New plugins enabled by default: mqtt
+#- New plugins enabled by default: mqtt, notify_nagios
 #- New plugins disabled by default: zone
 #
 * Wed May 27 2015 Marc Fournier <marc.fournier@camptocamp.com> 5.5.0-1
