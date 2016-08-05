@@ -39,7 +39,12 @@
 
 #define PLUGIN_FLAGS_GLOBAL 0x0001
 
-#define DATA_MAX_NAME_LEN 64
+#ifdef WRITE_MDM_JSON_SUPPORT
+// Increase the size to 512 so that we can send in JSON strings
+#define DATA_MAX_NAME_LEN 512 
+#else
+#define DATA_MAX_NAME_LEN 64 
+#endif
 
 #define DS_TYPE_COUNTER  0
 #define DS_TYPE_GAUGE    1
